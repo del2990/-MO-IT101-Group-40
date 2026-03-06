@@ -178,7 +178,7 @@ This allowed the team to:
 ## Project Plan Link
 
 Project Plan:  
-**[Insert your project plan link here]**
+**[Project Plan](https://docs.google.com/spreadsheets/d/1cBklH5QW7xFamQZRZQX-qEJxnJeZDuZU8miHq1C-LS8/edit?gid=2134013708#gid=2134013708)]**
 
 ---
 
