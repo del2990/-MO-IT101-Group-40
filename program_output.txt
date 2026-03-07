@@ -17,6 +17,28 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
 public class CP1Milestone2 {
+
+    /**
+    * Computes the total number of hours worked by an employee based on login
+    * and logout times from the attendance record.
+    *
+    * The method applies MotorPH attendance policies:
+    * - Official start time: 8:00 AM
+    * - Grace period: until 8:10 AM
+    * - Official end time: 5:00 PM
+    * - Maximum working hours per day: 8 hours
+    *
+    * If an employee logs in before the official start time,
+    * the login time is adjusted to 8:00 AM.
+    *
+    * If the employee logs out after the official end time,
+    * the logout time is adjusted to 5:00 PM.
+    *
+    * @param login  the recorded login time of the employee
+    * @param logout the recorded logout time of the employee
+    * @return the total number of hours worked for the day
+    */
+
     public static double computeTotalHoursWorked(LocalTime login, LocalTime logout) {
 
     LocalTime officialStart = LocalTime.of(8, 0);
@@ -45,6 +67,18 @@ public class CP1Milestone2 {
         // Maximum of 8 hours only
         return Math.min(hoursWorked, 8.0);
         }
+
+    /**
+    * Computes the Social Security System (SSS) deduction for an employee
+    * based on the official SSS salary contribution table.
+    *
+    * The deduction is determined by the employee's total gross salary
+     * for the payroll period.
+    *
+    * @param grossSalary the employee's total gross salary
+    * @return the SSS deduction amount
+    */
+
     public static double computeSSS(double grossSalary) {
 
         if (grossSalary < 3250) return 135.00;
@@ -94,6 +128,19 @@ public class CP1Milestone2 {
         else return 1125.00;
         }
     
+    /**
+    * Computes the PhilHealth contribution deduction for an employee.
+    *
+    * PhilHealth contribution is calculated as 3% of the employee's salary,
+    * shared equally between employer and employee. Only the employee share
+    * is deducted in this program.
+    *
+    * Salary limits are applied based on PhilHealth contribution rules.
+     *
+     * @param grossSalary the employee's total gross salary
+     * @return the PhilHealth deduction amount
+    */
+
     public static double computePhilHealth(double grossSalary) {
 
         if (grossSalary <= 10000) {
@@ -106,6 +153,18 @@ public class CP1Milestone2 {
             return 60000 * 0.03 / 2;
             }
         }
+
+    /**
+    * Computes the Pag-IBIG contribution deduction for an employee.
+     *
+    * Contribution rules:
+    * - 1% of salary if salary is between 1,000 and 1,500
+     * - 2% of salary if salary is above 1,500
+    *
+    * @param grossSalary the employee's total gross salary
+    * @return the Pag-IBIG deduction amount
+    */
+
     public static double computePagIbig(double grossSalary){
           if (grossSalary >= 1000 && grossSalary <= 1500) {
             return grossSalary * 0.01; // 1% for employee
@@ -117,6 +176,18 @@ public class CP1Milestone2 {
             return 0; // if salary below 1000
             } 
         }
+
+    /**
+    * Computes the employee's withholding income tax based on the
+    * Philippine TRAIN tax table.
+     *
+    * The tax amount is calculated using progressive tax brackets
+     * depending on the employee's monthly gross income.
+     *
+     * @param monthlyGross the employee's total gross salary
+     * @return the withholding tax deduction
+     */
+
     public static double computeIncomeTax(double monthlyGross) {
 
         if (monthlyGross <= 20832) {
@@ -138,6 +209,23 @@ public class CP1Milestone2 {
             return 200833.33 + (monthlyGross - 666667) * 0.35; // 200,833.33 + 35% in excess of 666,667
             } 
             }
+
+            /**
+     * Main method that runs the MotorPH Payroll System.
+     *
+    * The program performs the following operations:
+     * 1. Authenticates the user through username and password.
+     * 2. Determines whether the user is an employee or payroll staff.
+     * 3. Displays menu options based on the user role.
+     * 4. Reads employee and attendance records from CSV files.
+     * 5. Computes payroll including hours worked, gross salary,
+     *    government deductions, and net salary.
+     * 6. Displays payroll information for a selected employee or
+     *    all employees.
+    *
+    * @param args command-line arguments
+     */
+
     public static void main(String[] args) {
         String employeeDatabase = "src/MotorPH Employee Database.csv";
         String attendanceRecords = "src/MotorPH_Employee Data - Attendance Record.csv";
