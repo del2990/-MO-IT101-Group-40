@@ -366,7 +366,7 @@ public class CP1Milestone2 {
         double totalDeductions = sssDeductions + philHealthDeductions + pagibigDeductions + incomeTax;
 
         double firstNetSalary = firstGrossSalary;
-        double secondNetSalary = secondGrossSalary - totalDeductions;
+        double secondNetSalary = totalGrossSalary - totalDeductions;
 
         int index = month - 6;
 
@@ -470,7 +470,7 @@ public class CP1Milestone2 {
             double totalDeductions = sssDeductions + philHealthDeductions + pagibigDeductions + incomeTax;
 
             double firstNetSalary = firstGrossSalary;
-            double secondNetSalary = secondGrossSalary - totalDeductions;
+            double secondNetSalary = totalGrossSalary - totalDeductions;
 
             int index = month - 6;
 
