@@ -41,9 +41,9 @@ public class CP1Milestone2 {
 
     public static double computeTotalHoursWorked(LocalTime login, LocalTime logout) {
 
-    LocalTime officialStart = LocalTime.of(8, 0);
-    LocalTime graceTime = LocalTime.of(8, 10);
-    LocalTime officialEnd = LocalTime.of(17, 0);
+    LocalTime officialStart = LocalTime.of(8, 0); //8:00am
+    LocalTime graceTime = LocalTime.of(8, 10); //8:10am
+    LocalTime officialEnd = LocalTime.of(17, 0); //5:00pm
 
         if (logout.isAfter(officialEnd)) {
             logout = officialEnd;
@@ -271,6 +271,7 @@ public class CP1Milestone2 {
              System.out.println("2 - Exit");
            } 
         else if(selectedUsername.equals("payroll_staff")) {
+            System.out.println("Logged in as: " + selectedUsername);
             System.out.println("1 - Process Payroll");
             System.out.println("2 - Exit");
              } 
@@ -343,7 +344,7 @@ public class CP1Milestone2 {
             System.out.println("Birthday: " + displayBirthday);
         } 
         else if (selectedUsername.equals("payroll_staff")){
-            System.out.println("Logged in as: " + selectedUsername);
+            System.out.println("");
             System.out.println("Select Process:");
             System.out.println("1 - Display One Employee");
             System.out.println("2 - Display All Employees");
@@ -417,7 +418,7 @@ public class CP1Milestone2 {
 
         if (!data[0].trim().equals(employeeNumber)) continue;
 
-            String[] dateParts = data[3].split("/");
+            String[] dateParts = data[3].split("/"); 
             int recordMonth = Integer.parseInt(dateParts[0]);
             int day = Integer.parseInt(dateParts[1]);
             int year = Integer.parseInt(dateParts[2]);
