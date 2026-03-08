@@ -63,6 +63,11 @@ public class CP1Milestone2 {
     
         long minutesWorked = Duration.between(login, logout).toMinutes();
         double hoursWorked = minutesWorked / 60.0;
+        
+         // Subtact 1 hour for break time
+        if (hoursWorked > 1) {
+            hoursWorked -= 1;
+        }
     
         // Maximum of 8 hours only
         return Math.min(hoursWorked, 8.0);
