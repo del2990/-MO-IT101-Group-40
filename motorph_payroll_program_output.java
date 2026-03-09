@@ -232,7 +232,7 @@ public class CP1Milestone2 {
      */
 
     public static void main(String[] args) {
-        String employeeDatabase = "src/MotorPH Employee Database.csv";
+        String employeeDatabase = "src/MotorPH_Employee Data - Employee Details.csv";
         String attendanceRecords = "src/MotorPH_Employee Data - Attendance Record.csv";
     
         String validUsername1 = "employee";
