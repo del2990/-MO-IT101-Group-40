@@ -308,7 +308,7 @@ public class CP1Milestone2 {
 
     try (BufferedReader br = new BufferedReader(new FileReader(employeeDatabase))) {
 
-            br.readLine();
+            br.readLine(); //Skip header
             String line;
 
      while ((line = br.readLine()) != null) {
@@ -372,6 +372,7 @@ public class CP1Milestone2 {
     boolean found = false;
 
     try (BufferedReader br = new BufferedReader(new FileReader(employeeDatabase))) {
+        br.readLine(); //Skip header
         String line;
         while ((line = br.readLine()) != null) {
             if (line.trim().isEmpty()) continue;
@@ -381,7 +382,7 @@ public class CP1Milestone2 {
                 employeeLastName = data[1].trim();
                 employeeFirstName = data[2].trim();
                 employeeBirthday = data[3].trim();
-                employeeHourlyRate = Double.parseDouble(data[4].trim());
+                employeeHourlyRate = Double.parseDouble(data[18].trim());
                 found = true;
                 break;
             }
@@ -500,7 +501,7 @@ public class CP1Milestone2 {
         String employeeLastName = data[1].trim();
         String employeeFirstName = data[2].trim();
         String employeeBirthday = data[3].trim();
-        double employeeHourlyRate = Double.parseDouble(data[4].trim());
+        double employeeHourlyRate = Double.parseDouble(data[18].trim());
 
             System.out.println("Employee Number: " + employeeNumber);
             System.out.println("Employee Name: " + employeeFirstName + " " + employeeLastName);
