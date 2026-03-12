@@ -232,7 +232,7 @@ public class CP1Milestone2 {
      */
 
     public static void main(String[] args) {
-        String employeeDatabase = "src/MotorPH Employee Database.csv";
+        String employeeDatabase = "src/MotorPH_Employee Data - Employee Details.csv";
         String attendanceRecords = "src/MotorPH_Employee Data - Attendance Record.csv";
     
         String validUsername1 = "employee";
@@ -382,8 +382,7 @@ public class CP1Milestone2 {
                 employeeLastName = data[1].trim();
                 employeeFirstName = data[2].trim();
                 employeeBirthday = data[3].trim();
-                // The hourly rate is retrieved from a separate employee file and stored in an array for payroll computation.
-                employeeHourlyRate = Double.parseDouble(data[4].trim());
+                employeeHourlyRate = Double.parseDouble(data[data.length - 1].trim());
                 found = true;
                 break;
             }
@@ -502,8 +501,7 @@ public class CP1Milestone2 {
         String employeeLastName = data[1].trim();
         String employeeFirstName = data[2].trim();
         String employeeBirthday = data[3].trim();
-        // The hourly rate is retrieved from a separate employee file and stored in an array for payroll computation.
-        double employeeHourlyRate = Double.parseDouble(data[4].trim());
+        employeeHourlyRate = Double.parseDouble(data[data.length - 1].trim());
 
             System.out.println("Employee Number: " + employeeNumber);
             System.out.println("Employee Name: " + employeeFirstName + " " + employeeLastName);
