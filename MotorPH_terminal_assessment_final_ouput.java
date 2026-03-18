@@ -100,9 +100,9 @@ public class CP1Milestone2 {
             while ((line = br.readLine()) != null) {
                 if (line.trim().isEmpty()) continue;
                 String[] data = line.split(",");
-                String empNum = data[0].trim();
-                attendanceMap.putIfAbsent(empNum, new ArrayList<>());
-                attendanceMap.get(empNum).add(data);
+                String employeeNum = data[0].trim();
+                attendanceMap.putIfAbsent(employeeNum, new ArrayList<>());
+                attendanceMap.get(employeeNum).add(data);
             }
         } catch (Exception e) {
             System.out.println("Error reading attendance file.");
@@ -374,15 +374,18 @@ public class CP1Milestone2 {
                 int selectedOption = Integer.parseInt(input.nextLine());
                 
                 switch (selectedOption) {
-                    case 1:
+                    case 1 -> {
                         System.out.print("\nEnter Employee Number: ");
                         String inputEmployeeNumber = input.nextLine();
                         
                         try (BufferedReader br = new BufferedReader(new FileReader(employeeDatabase))) {
-                            br.readLine(); // skip header
+                            br.readLine(); 
                             String line;
                             boolean found = false;
-                            String employeeNumber = "", employeeFirstName = "", employeeLastName = "", employeeBirthday = "";
+                            String employeeNumber = ""; 
+                            String employeeLastName = "";
+                            String employeeFirstName = "";
+                            String employeeBirthday = "";
                             double employeeHourlyRate = 0;
                             
                             while ((line = br.readLine()) != null) {
@@ -409,11 +412,11 @@ public class CP1Milestone2 {
                         } catch (Exception e) {
                             System.out.println("Error reading employee file.");
                         }
-                        break;
+                    }
                         
-                    case 2:
+                    case 2 -> {
                         try (BufferedReader br = new BufferedReader(new FileReader(employeeDatabase))) {
-                            br.readLine(); // skip header
+                            br.readLine(); 
                             String line;
                             while ((line = br.readLine()) != null) {
                                 if (line.trim().isEmpty()) continue;
@@ -429,10 +432,11 @@ public class CP1Milestone2 {
                         } catch (Exception e) {
                             System.out.println("Error reading employee file.");
                         }
-                        break;
+                    } 
+                    default -> System.out.println("Invalid option selected. Please restart the program and choose either 1 or 2.");
                 }
-            }       }
-
+            }      
+        }
     case "2" -> running = false;
 
     default -> System.out.println("Invalid option selected. Please restart the program and choose either 1 or 2.");
