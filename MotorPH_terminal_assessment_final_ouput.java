@@ -1,4 +1,4 @@
-package cp1milestone2;
+package finalcodeoutput;
 
 /*
 MotorPH Payroll System
@@ -17,118 +17,112 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
-public class CP1Milestone2 {
-    //These are the constant variable used to calculate total hours work.
-    static final String[] months = {"June", "July", "August", "September", "October", "November", "December"};
-    static final DateTimeFormatter timeFormat = DateTimeFormatter.ofPattern("H:mm");
+public class FinalCodeOutput {
+ //These are the constant variable used to calculate total hours work.
+ static final String[] months = {"June", "July", "August", "September", "October", "November", "December"};
+ static final DateTimeFormatter timeFormat = DateTimeFormatter.ofPattern("H:mm");
+ /**
+ * Handles user authentication by prompting for username and password.
+ * Allows a maximum of 5 attempts.
+ *
+ * @param input Scanner object for user input
+ * @param validUsername1 first valid username (employee)
+ * @param validUsername2 second valid username (payroll_staff)
+ * @return the username if login is successful, otherwise null
+ */
+    public static String loginPage(Scanner input, String validUsername1, String validUsername2) {
 
-    //This method is the main payroll calculation.
-    public static void computePayroll(String employeeNumber, String employeeFirstName, String employeeLastName,
-                                      String employeeBirthday, double employeeHourlyRate,
-                                      Map<String, List<String[]>> attendanceMap) {
-        System.out.println("");
-        System.out.println("Employee Number: " + employeeNumber);
-        System.out.println("Employee Name: " + employeeFirstName + " " + employeeLastName);
-        System.out.println("Birthday: " + employeeBirthday);
+        String correctPassword = "12345";
 
-        for (int month = 6; month <= 12; month++) {
-            double firstHalf = 0;
-            double secondHalf = 0;
+        // Loop for maximum of 5 login attempts
+        for (int attempt = 1; attempt <= 5; attempt++) {
 
-            List<String[]> records = attendanceMap.get(employeeNumber);
-            if (records != null) {
-                for (String[] data : records) {
-                    if (data.length < 6) continue;
+            System.out.print("Enter Username: ");
+            String username = input.nextLine();
 
-                    String[] dateParts = data[3].split("/");
-                    int recordMonth = Integer.parseInt(dateParts[0]);
-                    int day = Integer.parseInt(dateParts[1]);
-                    int year = Integer.parseInt(dateParts[2]);
+            System.out.print("Enter Password: ");
+            String password = input.nextLine();
 
-                    if (year != 2024 || recordMonth != month) continue;
-
-                    LocalTime login = LocalTime.parse(data[4].trim(), timeFormat);
-                    LocalTime logout = LocalTime.parse(data[5].trim(), timeFormat);
-
-                    double hours = computeTotalHoursWorked(login, logout);
-
-                    if (day <= 15) firstHalf += hours;
-                    else secondHalf += hours;
-                }
-            }
-
-            double firstGrossSalary = firstHalf * employeeHourlyRate;
-            double secondGrossSalary = secondHalf * employeeHourlyRate;
-            double totalGrossSalary = firstGrossSalary + secondGrossSalary;
-
-            double sssDeductions = computeSSS(totalGrossSalary);
-            double philHealthDeductions = computePhilHealth(totalGrossSalary);
-            double pagibigDeductions = computePagIbig(totalGrossSalary);
-            double incomeTax = computeIncomeTax(totalGrossSalary);
-            double totalDeductions = sssDeductions + philHealthDeductions + pagibigDeductions + incomeTax;
-
-            double firstNetSalary = firstGrossSalary; 
-            double secondNetSalary = totalGrossSalary - totalDeductions;
-
-            int index = month - 6;
-
-            System.out.println("\nMonth: " + months[index]);
-
-            System.out.println("\nFirst Cutoff: " + months[index] + " 1 to 15");
-            System.out.println("Total Hours Worked: " + firstHalf);
-            System.out.println("Gross Salary: " + firstGrossSalary);
-            System.out.println("Net Salary: " + firstNetSalary);
-
-            System.out.println("\nSecond Cutoff: " + months[index] + " 16 to 30");
-            System.out.println("Total Hours Worked: " + secondHalf);
-            System.out.println("Gross Salary: " + secondGrossSalary);
-            System.out.println("SSS Deduction: " + sssDeductions);
-            System.out.println("PhilHealth Deduction: " + philHealthDeductions);
-            System.out.println("Pag-IBIG Deduction: " + pagibigDeductions);
-            System.out.println("Withholding Tax Deduction: " + incomeTax);
-            System.out.println("Total Deductions: " + totalDeductions);
-            System.out.println("Net Salary: " + secondNetSalary);
+        // Check if credentials are valid
+        if ((username.equals(validUsername1) || username.equals(validUsername2)) 
+            && password.equals(correctPassword)) {
+            System.out.println("Login Successful!\n");
+            // Return the logged-in username
+            return username;
+             } else {
+            System.out.println("Incorrect username and/or password. Attempt " + attempt + " of 5.\n");
+             }
         }
+        // If all 5 attempts fail this will print out
+        System.out.println("Maximum attempts reached. Program terminated.");
+        return null;
     }
-    //This method reads the file of employee database.
-    public static String[] readEmployeeData (String employeeDatabase, String inputEmployeeNumber) {
+    /**
+    * Reads the employee database CSV file and retrieves the details
+    * of a specific employee based on the given employee number.
+    *
+    * The method searches each row in the file and returns only the
+    * necessary fields once a match is found.
+    *
+    * @param employeeDatabase the file path of the employee CSV file
+    * @param inputEmployeeNumber the employee number to search for
+    * @return an array containing employee details:
+    * [employeeNumber, lastName, firstName, birthday, hourlyRate]
+    * or null if the employee is not found
+    */
+    public static String[] readEmployeeData(String employeeDatabase, String inputEmployeeNumber) {
         try (BufferedReader br = new BufferedReader(new FileReader(employeeDatabase))) {
-        br.readLine(); 
-        String line;
-
-        while ((line = br.readLine()) != null) {
-            if (line.trim().isEmpty()) continue;
-
-            String[] data = line.split(",");
-
-            if (data[0].trim().equals(inputEmployeeNumber)) {
-                return new String[] {
-                    data[0].trim(), //employeeNumber
-                    data[1].trim(), // lastName
-                    data[2].trim(), // firstName
-                    data[3].trim(), // birthday
-                    data[data.length - 1].trim() // hourlyRate
-                };
-            }
-        }
-    } catch (Exception e) {
-        System.out.println("Error reading employee file.");
-    }
-    return null; 
-    }
-    //This method reads the file of employee attendance records.
-    public static Map<String, List<String[]>> loadAttendanceRecords(String attendanceRecords) {
-        Map<String, List<String[]>> attendanceMap = new HashMap<>();
-        try (BufferedReader br = new BufferedReader(new FileReader(attendanceRecords))) {
-            br.readLine(); 
+            br.readLine(); // Skip the header row to avoid processing column titles
             String line;
+            // Iterate through each record in the employee database file
             while ((line = br.readLine()) != null) {
+                // Skip empty lines to prevent processing invalid data
                 if (line.trim().isEmpty()) continue;
                 String[] data = line.split(",");
-                String employeeNumber = data[0].trim();
-                attendanceMap.putIfAbsent(employeeNumber, new ArrayList<>());
-                attendanceMap.get(employeeNumber).add(data);
+                if (data[0].trim().equals(inputEmployeeNumber)){
+                    return new String[] {
+                    data[0].trim(),// Array for employee number of the matched record
+                    data[1].trim(),// Array for employee last name
+                    data[2].trim(),// Array for employee first name
+                    data[3].trim(),// Array for employee birthday
+                    data[data.length - 1].trim()//Array for employee hourly rate (last column)
+                    };
+                } 
+                
+            } 
+        }catch (Exception e){
+            System.out.println("Error reading employee file.");
             }
+        return null;
+    }
+    /**
+    * Reads the attendance CSV file and stores all records in a Map.
+    * Each employee number is mapped to a list of their attendance records.
+    *
+    * @param attendanceRecords the file path of the attendance CSV file
+    * @return a Map where the key is employee number and value is list of records
+    */
+    public static Map<String, List<String[]>> loadAttendanceRecords(String attendanceRecords) {
+        Map<String, List<String[]>> attendanceMap = new HashMap<>();
+
+        try (BufferedReader br = new BufferedReader(new FileReader(attendanceRecords))) {
+            br.readLine(); // Skip the header row to avoid processing column titles
+            String line;
+
+            // Iterate through each attendance record in the file
+            while ((line = br.readLine()) != null) {
+            // Skip empty lines to prevent invalid data processing
+            if (line.trim().isEmpty()) continue;
+            String[] data = line.split(",");
+            String employeeNumber = data[0].trim();
+            // If employee is not yet in the map, initialize a new list
+            if (!attendanceMap.containsKey(employeeNumber)) {
+                attendanceMap.put(employeeNumber, new ArrayList<>());
+            }
+            // Add the attendance record to the corresponding employee
+            attendanceMap.get(employeeNumber).add(data);
+            }
+
         } catch (Exception e) {
             System.out.println("Error reading attendance file.");
         }
@@ -155,21 +149,44 @@ public class CP1Milestone2 {
     * @return the total number of hours worked for the day
     */
     public static double computeTotalHoursWorked(LocalTime login, LocalTime logout) {
-        LocalTime officialStart = LocalTime.of(8, 0);
-        LocalTime graceTime = LocalTime.of(8, 10);
-        LocalTime officialEnd = LocalTime.of(17, 0);
 
-        if (logout.isAfter(officialEnd)) logout = officialEnd;
-        if (login.isBefore(officialStart)) login = officialStart;
-        if (!login.isAfter(graceTime)) login = officialStart;
-        if (login.isAfter(logout)) return 0;
+        LocalTime officialStart = LocalTime.of(8, 0); // Official work start time (8:00 AM)
+        LocalTime graceTime = LocalTime.of(8, 10);    // Grace period limit (8:10 AM)
+        LocalTime officialEnd = LocalTime.of(17, 0);  // Official end time (5:00 PM)
 
+        // Adjust logout if it exceeds official working hours
+        if (logout.isAfter(officialEnd)) {
+            logout = officialEnd;
+        }
+
+        // Adjust login if earlier than allowed working time
+        if (login.isBefore(officialStart)) {
+            login = officialStart;
+        }
+
+        // Apply grace period rule: if within grace time, treat as on-time (8:00 AM)
+        if (!login.isAfter(graceTime)) {
+            login = officialStart;
+        }
+
+        // Prevent negative working hours scenario
+        if (login.isAfter(logout)) {
+            return 0;
+        }
+
+        // Compute total minutes worked and convert to hours
         long minutesWorked = Duration.between(login, logout).toMinutes();
         double hoursWorked = minutesWorked / 60.0;
-        if (hoursWorked > 1) hoursWorked -= 1;
+
+        // Subtract 1 hour for lunch break as per company policy
+        if (hoursWorked > 1) {
+            hoursWorked -= 1;
+        }
+
+        // Cap working hours to maximum of 8 hours per day
         return Math.min(hoursWorked, 8.0);
-    }
-     /**
+    } 
+    /**
     * Computes the Social Security System (SSS) deduction for an employee
     * based on the official SSS salary contribution table.
     *
@@ -234,31 +251,41 @@ public class CP1Milestone2 {
     * is deducted in this program.
     *
     * Salary limits are applied based on PhilHealth contribution rules.
-     *
-     * @param grossSalary the employee's total gross salary
-     * @return the PhilHealth deduction amount
+    *
+    * @param grossSalary the employee's total gross salary
+    * @return the PhilHealth deduction amount
     */
     public static double computePhilHealth(double grossSalary) {
-        if (grossSalary <= 10000) return 10000 * 0.03 / 2;
-        else if (grossSalary <= 59999.99) return grossSalary * 0.03 / 2;
-        else return 60000 * 0.03 / 2;
+        // Apply PhilHealth contribution limits and compute employee share (50%)
+        if (grossSalary <= 10000) {
+            return 10000 * 0.03 / 2;
+        } else if (grossSalary <= 59999.99) {
+            return grossSalary * 0.03 / 2;
+        } else {
+            return 60000 * 0.03 / 2;
+        }
     }
     /**
     * Computes the Pag-IBIG contribution deduction for an employee.
-     *
+    *
     * Contribution rules:
     * - 1% of salary if salary is between 1,000 and 1,500
-     * - 2% of salary if salary is above 1,500
+    * - 2% of salary if salary is above 1,500
     *
     * @param grossSalary the employee's total gross salary
     * @return the Pag-IBIG deduction amount
     */
-    public static double computePagIbig(double grossSalary){
-        if (grossSalary >= 1000 && grossSalary <= 1500) return grossSalary * 0.01;
-        else if (grossSalary > 1500) return grossSalary * 0.02;
-        else return 0;
+    public static double computePagIbig(double grossSalary) {
+        // Apply Pag-IBIG contribution rules based on salary range
+        if (grossSalary >= 1000 && grossSalary <= 1500) {
+            return grossSalary * 0.01;
+        } else if (grossSalary > 1500) {
+            return grossSalary * 0.02;
+        } else {
+            return 0;
+        }
     }
-     /**
+    /**
     * Computes the employee's withholding income tax based on the
     * Philippine TRAIN tax table.
     *
@@ -269,6 +296,7 @@ public class CP1Milestone2 {
     * @return the withholding tax deduction
     */
     public static double computeIncomeTax(double monthlyGross) {
+        // Apply TRAIN law tax brackets progressively
         if (monthlyGross <= 20832) return 0;
         else if (monthlyGross <= 33332) return (monthlyGross - 20833) * 0.20;
         else if (monthlyGross <= 66666) return 2500 + (monthlyGross - 33333) * 0.25;
@@ -277,154 +305,204 @@ public class CP1Milestone2 {
         else return 200833.33 + (monthlyGross - 666667) * 0.35;
     }
     /**
-    * Main method that runs the MotorPH Payroll System.
+    * Calculates and displays the payroll for a specific employee.
     *
-    * The program performs the following operations:
-    * 1. Authenticates the user through username and password.
-    * 2. Determines whether the user is an employee or payroll staff.
-    * 3. Displays menu options based on the user role.
-    * 4. Reads employee and attendance records from CSV files.
-    * 5. Computes payroll including hours worked, gross salary,
-    *    government deductions, and net salary.
-    * 6. Displays payroll information for a selected employee or
-    *    all employees.
+    * The method computes total hours worked per month (June to December),
+    * separates them into first (1-15) and second (16-end) cutoffs,
+    * calculates gross salary, applies deductions (SSS, PhilHealth, Pag-IBIG, Income Tax),
+    * and prints net salary for each cutoff.
     *
-    * @param args command-line arguments
+    * @param employeeNumber employee's unique ID
+    * @param employeeFirstName employee's first name
+    * @param employeeLastName employee's last name
+    * @param employeeBirthday employee's birthday
+    * @param employeeHourlyRate hourly rate of the employee
+    * @param attendanceMap map containing all attendance records by employee number
+    */
+    public static void computePayroll(String employeeNumber, String employeeFirstName, String employeeLastName,
+    String employeeBirthday, double employeeHourlyRate,Map<String, List<String[]>> attendanceMap){
+        
+        System.out.println("");
+        System.out.println("Employee Number: " + employeeNumber);
+        System.out.println("Employee Name: " + employeeFirstName + " " + employeeLastName);
+        System.out.println("Birthday: " + employeeBirthday);
+        
+        for (int month = 6; month <= 12; month++){
+            double firstHalf = 0;
+            double secondHalf = 0;
+            
+        List<String[]> records = attendanceMap.get(employeeNumber);
+        if (records != null) {
+            for (String[] data : records) {
+            if (data.length < 6) continue;
+
+                String[] dateParts = data[3].split("/");
+                int recordMonth = Integer.parseInt(dateParts[0]);
+                int day = Integer.parseInt(dateParts[1]);
+                int year = Integer.parseInt(dateParts[2]);
+
+            if (year != 2024 || recordMonth != month) continue;
+
+                LocalTime login = LocalTime.parse(data[4].trim(), timeFormat);
+                LocalTime logout = LocalTime.parse(data[5].trim(), timeFormat);
+
+                double hours = computeTotalHoursWorked(login, logout);
+
+            if (day <= 15) 
+            firstHalf += hours;
+            else 
+            secondHalf += hours;
+            }
+        }
+            double firstGrossSalary = firstHalf * employeeHourlyRate;
+            double secondGrossSalary = secondHalf * employeeHourlyRate;
+            double totalGrossSalary = firstGrossSalary + secondGrossSalary;
+
+            double sssDeductions = computeSSS(totalGrossSalary);
+            double philHealthDeductions = computePhilHealth(totalGrossSalary);
+            double pagibigDeductions = computePagIbig(totalGrossSalary);
+            double incomeTax = computeIncomeTax(totalGrossSalary);
+            double totalDeductions = sssDeductions + philHealthDeductions + pagibigDeductions + incomeTax;
+
+            double firstNetSalary = firstGrossSalary; 
+            double secondNetSalary = totalGrossSalary - totalDeductions;
+
+            int index = month - 6;
+
+            System.out.println("\nMonth: " + months[index]);
+
+            System.out.println("\nFirst Cutoff: " + months[index] + " 1 to 15");
+            System.out.println("Total Hours Worked: " + firstHalf);
+            System.out.println("Gross Salary: " + firstGrossSalary);
+            System.out.println("Net Salary: " + firstNetSalary);
+
+            System.out.println("\nSecond Cutoff: " + months[index] + " 16 to 30");
+            System.out.println("Total Hours Worked: " + secondHalf);
+            System.out.println("Gross Salary: " + secondGrossSalary);
+            System.out.println("SSS Deduction: " + sssDeductions);
+            System.out.println("PhilHealth Deduction: " + philHealthDeductions);
+            System.out.println("Pag-IBIG Deduction: " + pagibigDeductions);
+            System.out.println("Withholding Tax Deduction: " + incomeTax);
+            System.out.println("Total Deductions: " + totalDeductions);
+            System.out.println("Net Salary: " + secondNetSalary);     
+        }
+    }
+    /**
+     * Entry point of the MotorPH Payroll System.
+    *
+    * Handles user login, loads employee and attendance data,
+    * displays main menu options based on user type (employee or payroll staff),
+    * and calls appropriate methods to view or process payroll.
+    *
+    * @param args command-line arguments (not used)
     */
     public static void main(String[] args) {
+        // File paths for employee details and attendance CSV files
         String employeeDatabase = "src/MotorPH_Employee Data - Employee Details.csv";
         String attendanceRecords = "src/MotorPH_Employee Data - Attendance Record.csv";
-
+        // Predefined valid usernames for login system
         String validUsername1 = "employee";
         String validUsername2 = "payroll_staff";
-        try (Scanner input = new Scanner(System.in)) {
-            boolean isAuthenticated = false;
-            String correctPassword = "12345";
-            String selectedUsername = "";
-            
-            // ===== LOGIN =====
-            for (int attempt = 1; attempt <= 5; attempt++) {
-                System.out.print("Enter Username: ");
-                String username = input.nextLine();
+        Scanner input = new Scanner(System.in);
+        // Call loginPage method to authenticate user
+        String selectedUsername = loginPage(input, validUsername1, validUsername2);
+        // This block of code check if the login failed (null is returned if max attempts exceeded)
+        if (selectedUsername == null) {
+        input.close();
+        return;
+        } 
+        // Load all attendance records into a Map for quick access by employee number
+        Map<String, List<String[]>> attendanceMap = loadAttendanceRecords(attendanceRecords);
+        boolean running = true;
+        // Main menu loop, continues until the user chooses to exit
+        while(running) {
+            // Display the main menu based on logged-in user type
+            System.out.println("\n=== MAIN MENU ===");
+            System.out.println("Logged in as: " + selectedUsername);
                 
-                System.out.print("Enter Password: ");
-                String password = input.nextLine();
-                
-                if ((username.equals(validUsername1) || username.equals(validUsername2)) && password.equals(correctPassword)) {
-                    isAuthenticated = true;
-                    selectedUsername = username;
-                    System.out.println("Login Successful!\n");
-                    break;
-                } else {
-                    System.out.println("Incorrect username and/or password. Attempt " + attempt + " of 5.\n");
-                }
+            if (selectedUsername.equals("employee")) {
+            System.out.println("1 - View my Payroll");
+            System.out.println("2 - Exit");
+            } else if (selectedUsername.equals("payroll_staff")) {
+            System.out.println("1 - Process Payroll");
+            System.out.println("2 - Exit");
             }
-            
-            if (!isAuthenticated) {
-                System.out.println("Maximum attempts reached. Program terminated.");
-                input.close();
-                return;
-            }
-            
-            //This section will help the attendance to load at once.
-            Map<String, List<String[]>> attendanceMap = loadAttendanceRecords(attendanceRecords);
-            
-            boolean running = true;
-            while (running) {
-                //This block of code dislays the main menu.
-                System.out.println("\n=== MAIN MENU ===");
-                System.out.println("Logged in as: " + selectedUsername);
+            System.out.print("Select option: ");
+            String chosenOption = input.nextLine();
+        switch (chosenOption) {    
+            case "1" -> {
                 
                 if (selectedUsername.equals("employee")) {
-                    System.out.println("1 - View my Payroll");
-                    System.out.println("2 - Exit");
-                } else if (selectedUsername.equals("payroll_staff")) {
-                    System.out.println("1 - Process Payroll");
-                    System.out.println("2 - Exit");
+                // Employee option: view their own payroll info    
+                System.out.print("Enter your Employee Number: ");
+                String inputNumber = input.nextLine();
+                String[] employeeData = readEmployeeData(employeeDatabase, inputNumber);
+                if (employeeData == null) {
+                System.out.println("Employee number does not exist.");
+                break;
+                } 
+                String displayNumber = employeeData[0];
+                String displayLastName = employeeData[1];
+                String displayFirstName = employeeData[2];
+                String displayBirthday = employeeData[3];
+                //Print basic employee information
+                System.out.println("\nEmployee Number: " + displayNumber);
+                System.out.println("Employee Name: " + displayFirstName + " " + displayLastName);
+                System.out.println("Birthday: " + displayBirthday);
+            
+            } else if (selectedUsername.equals("payroll_staff")) {
+                // Payroll staff option: choose to process one or all employees
+                System.out.println("\nSelect Process:");
+                System.out.println("1 - Display One Employee");
+                System.out.println("2 - Display All Employees");
+                System.out.print("Selected Process: ");
+                int selectedProcess = Integer.parseInt(input.nextLine());
+            switch (selectedProcess) {
+            case 1 -> {
+                System.out.print("\nEnter Employee Number: ");
+                String inputEmployeeNumber = input.nextLine();
+                String[] employeeData = readEmployeeData(employeeDatabase, inputEmployeeNumber);
+                if (employeeData == null) {
+                    System.out.println("Employee number does not exist.");
+                   break;
                 }
-                
-                System.out.print("Select option: ");
-                String chosenOption = input.nextLine();
-                switch (chosenOption) {
-                    case "1" -> {
-                        if (selectedUsername.equals("employee")) {
-                            
-                            System.out.print("Enter your Employee Number: ");
-                            String inputNumber = input.nextLine();
-                            
-                            String[] employeeData = readEmployeeData(employeeDatabase, inputNumber);
-                            
-                            if (employeeData == null) {
-                                System.out.println("Employee number does not exist.");
-                                break;
-                            }
-                            
-                            String displayNumber = employeeData[0];
-                            String displayLastName = employeeData[1];
-                            String displayFirstName = employeeData[2];
-                            String displayBirthday = employeeData[3];
-                            
-                            System.out.println("\nEmployee Number: " + displayNumber);
-                            System.out.println("Employee Name: " + displayFirstName + " " + displayLastName);
-                            System.out.println("Birthday: " + displayBirthday);
-                            
-                        } else if (selectedUsername.equals("payroll_staff")) {
-                            // Payroll staff view
-                            System.out.println("\nSelect Process:");
-                            System.out.println("1 - Display One Employee");
-                            System.out.println("2 - Display All Employees");
-                            System.out.print("Selected Process: ");
-                            int selectedOption = Integer.parseInt(input.nextLine());
-                            
-                            switch (selectedOption) {
-                                case 1 -> {
-                                    System.out.print("\nEnter Employee Number: ");
-                                    String inputEmployeeNumber = input.nextLine();
-                                    
-                                    String[] employeeData = readEmployeeData(employeeDatabase, inputEmployeeNumber);
-                                    
-                                    if (employeeData == null) {
-                                        System.out.println("Employee number does not exist.");
-                                        break;
-                                    }
-                                    
-                                    String employeeNumber = employeeData[0];
-                                    String employeeLastName = employeeData[1];
-                                    String employeeFirstName = employeeData[2];
-                                    String employeeBirthday = employeeData[3];
-                                    double employeeHourlyRate = Double.parseDouble(employeeData[4]);
-                                    
-                                    computePayroll(employeeNumber, employeeFirstName, employeeLastName, employeeBirthday, employeeHourlyRate, attendanceMap);
-                                }
-                                
-                                case 2 -> {
-                                    try (BufferedReader br = new BufferedReader(new FileReader(employeeDatabase))) {
-                                        br.readLine();
-                                        String line;
-                                        while ((line = br.readLine()) != null) {
-                                            if (line.trim().isEmpty()) continue;
-                                            String[] data = line.split(",");
-                                            String employeeNumber = data[0].trim();
-                                            String employeeLastName = data[1].trim();
-                                            String employeeFirstName = data[2].trim();
-                                            String employeeBirthday = data[3].trim();
-                                            double employeeHourlyRate = Double.parseDouble(data[data.length - 1].trim());
-                                            computePayroll(employeeNumber, employeeFirstName, employeeLastName, employeeBirthday, employeeHourlyRate, attendanceMap);
-                                        }
-                                        System.out.println("Payroll calculation successful. All employees displayed.");
-                                    } catch (Exception e) {
-                                        System.out.println("Error reading employee file.");
-                                    }
-                                }
-                                default -> System.out.println("Invalid option selected. Please restart the program and choose either 1 or 2.");
-                            }
-                        }
-                    } 
-                    case "2" -> running = false;
-                    
-                    default -> System.out.println("Invalid option selected. Please restart the program and choose either 1 or 2.");
+                String employeeNumber = employeeData[0];
+                String employeeLastName = employeeData[1];
+                String employeeFirstName = employeeData[2];
+                String employeeBirthday = employeeData[3];
+                double employeeHourlyRate = Double.parseDouble(employeeData[4]);
+                // Compute and display payroll for this employee using the method
+                computePayroll(employeeNumber, employeeFirstName, employeeLastName, employeeBirthday, employeeHourlyRate, attendanceMap);     
+            }
+            case 2 -> {
+            // Display payroll for all employees
+            try (BufferedReader br = new BufferedReader(new FileReader(employeeDatabase))) {
+                br.readLine();
+                String line;
+                while ((line = br.readLine()) != null) {
+                    if (line.trim().isEmpty()) continue;
+                    String[] data = line.split(",");
+                    String employeeNumber = data[0].trim();
+                    String employeeLastName = data[1].trim();
+                    String employeeFirstName = data[2].trim();
+                    String employeeBirthday = data[3].trim();
+                    double employeeHourlyRate = Double.parseDouble(data[data.length - 1].trim());
+                    //Compute payroll for each employee
+                    computePayroll(employeeNumber, employeeFirstName, employeeLastName, employeeBirthday, employeeHourlyRate, attendanceMap);
+                }
+                System.out.println("Payroll calculation successful. All employees displayed.");
+                } catch (Exception e) {
+                System.out.println("Error reading employee file.");
                 }
             }
+            default -> System.out.println("Invalid option selected. Please restart the program and choose either 1 or 2.");
+            } 
+            } 
+            }
+        case "2" -> running = false; // If the user chose to exit the program (2)
+        //If the user selected an option that is not 1 or 2
+        default -> System.out.println("Invalid option selected. Please restart the program and choose either 1 or 2.");
+        }
         }
     }
 }
