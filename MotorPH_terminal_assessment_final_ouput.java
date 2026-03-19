@@ -326,26 +326,27 @@ public class FinalCodeOutput {
         System.out.println("Employee Number: " + employeeNumber);
         System.out.println("Employee Name: " + employeeFirstName + " " + employeeLastName);
         System.out.println("Birthday: " + employeeBirthday);
-        
+        // Loop through each month from June (6) to December (12)
         for (int month = 6; month <= 12; month++){
             double firstHalf = 0;
             double secondHalf = 0;
-            
+        // Get all attendance records for this employee
         List<String[]> records = attendanceMap.get(employeeNumber);
         if (records != null) {
             for (String[] data : records) {
             if (data.length < 6) continue;
-
+                // Parsing the date of attendance record
                 String[] dateParts = data[3].split("/");
                 int recordMonth = Integer.parseInt(dateParts[0]);
                 int day = Integer.parseInt(dateParts[1]);
                 int year = Integer.parseInt(dateParts[2]);
-
+             
+            // Only consider records for the current month and year 2024
             if (year != 2024 || recordMonth != month) continue;
-
+                // Parse login and logout times from CSV
                 LocalTime login = LocalTime.parse(data[4].trim(), timeFormat);
                 LocalTime logout = LocalTime.parse(data[5].trim(), timeFormat);
-
+                
                 double hours = computeTotalHoursWorked(login, logout);
 
             if (day <= 15) 
