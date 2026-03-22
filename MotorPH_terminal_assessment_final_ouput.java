@@ -389,19 +389,17 @@ public class FinalCodeOutput {
             System.out.println("Net Salary: " + secondNetSalary);     
         }
     }
-   
-    public static void main(String[] args) 
-     /**
-     * Entry point of the MotorPH Payroll System.
-     * Purpose of the program: 
-     * 
-     * The MotorPH Payroll System manages employee attendance and payroll.
-     * It handles user authentication, loads employee and attendance data,
-     * calculates total hours worked based on company attendance policies,
-     * applies payroll deductions such as PhilHealth contributions,
-     * and provides menu options for employees and payroll staff to view or process payroll.
-      */
-         {
+ 
+    /**
+    * Entry point of the MotorPH Payroll System.
+    *
+    * Handles user login, loads employee and attendance data,
+    * displays main menu options based on user type (employee or payroll staff),
+    * and calls appropriate methods to view or process payroll.
+    *
+    * @param args command-line arguments (not used)
+    */
+    public static void main(String[] args)  {
         // File paths for employee details and attendance CSV files
         String employeeDatabase = "src/MotorPH_Employee Data - Employee Details.csv";
         String attendanceRecords = "src/MotorPH_Employee Data - Attendance Record.csv";
