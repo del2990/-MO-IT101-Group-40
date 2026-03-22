@@ -18,17 +18,19 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 public class FinalCodeOutput {
- //These are the constant variable used to calculate total hours work.
+ //These are the constant variables used to calculate the total hours worked.
  static final String[] months = {"June", "July", "August", "September", "October", "November", "December"};
  static final DateTimeFormatter timeFormat = DateTimeFormatter.ofPattern("H:mm");
  /**
- * Handles user authentication by prompting for username and password.
- * Allows a maximum of 5 attempts.
+ * Prompts the user to log in by entering a username and password.
+ * The user is allowed up to 5 attempts to provide valid credentials.
+ * Login is considered successful if the entered username matches
+ * either of the predefined valid usernames.
  *
- * @param input Scanner object for user input
- * @param validUsername1 first valid username (employee)
- * @param validUsername2 second valid username (payroll_staff)
- * @return the username if login is successful, otherwise null
+ * @param input Scanner used to read user input
+ * @param validUsername1 the first accepted username (employee)
+ * @param validUsername2 the second accepted username (payroll staff)
+ * @return the authenticated username if login succeeds; otherwise null
  */
     public static String loginPage(Scanner input, String validUsername1, String validUsername2) {
 
@@ -43,33 +45,33 @@ public class FinalCodeOutput {
             System.out.print("Enter Password: ");
             String password = input.nextLine();
 
-        // Check if credentials are valid
+        // Validates user credentials
         if ((username.equals(validUsername1) || username.equals(validUsername2)) 
             && password.equals(correctPassword)) {
             System.out.println("Login Successful!\n");
-            // Return the logged-in username
+            // Returns the username if login is successful.
             return username;
              } else {
             System.out.println("Incorrect username and/or password. Attempt " + attempt + " of 5.\n");
              }
         }
-        // If all 5 attempts fail this will print out
+        // Displays a message after 5 failed login attempts.
         System.out.println("Maximum attempts reached. Program terminated.");
         return null;
     }
-    /**
-    * Reads the employee database CSV file and retrieves the details
-    * of a specific employee based on the given employee number.
-    *
-    * The method searches each row in the file and returns only the
-    * necessary fields once a match is found.
-    *
-    * @param employeeDatabase the file path of the employee CSV file
-    * @param inputEmployeeNumber the employee number to search for
-    * @return an array containing employee details:
-    * [employeeNumber, lastName, firstName, birthday, hourlyRate]
-    * or null if the employee is not found
-    */
+ /**
+ * Reads the employee CSV file and searches for a record that matches
+ * the specified employee number.
+ *
+ * Iterates through each row in the file and, once a match is found,
+ * extracts and returns the relevant employee details.
+ *
+ * @param employeeDatabase the path to the employee CSV file
+ * @param inputEmployeeNumber the employee number to look up
+ * @return an array containing the employee details in the format:
+ * [employeeNumber, lastName, firstName, birthday, hourlyRate];
+ * returns null if no matching employee is found
+ */
     public static String[] readEmployeeData(String employeeDatabase, String inputEmployeeNumber) {
         try (BufferedReader br = new BufferedReader(new FileReader(employeeDatabase))) {
             br.readLine(); // Skip the header row to avoid processing column titles
@@ -81,11 +83,11 @@ public class FinalCodeOutput {
                 String[] data = line.split(",");
                 if (data[0].trim().equals(inputEmployeeNumber)){
                     return new String[] {
-                    data[0].trim(),// Array for employee number of the matched record
-                    data[1].trim(),// Array for employee last name
-                    data[2].trim(),// Array for employee first name
-                    data[3].trim(),// Array for employee birthday
-                    data[data.length - 1].trim()//Array for employee hourly rate (last column)
+                    data[0].trim(),// Array containing the employee number of the matched record.
+                    data[1].trim(),// Array containing the employee's last name
+                    data[2].trim(),// Array containing the employee's first name
+                    data[3].trim(),// Array containing the employee's birthday
+                    data[data.length - 1].trim()//Array containing the employee’s hourly rate (last column).
                     };
                 } 
                 
@@ -100,7 +102,7 @@ public class FinalCodeOutput {
     * Each employee number is mapped to a list of their attendance records.
     *
     * @param attendanceRecords the file path of the attendance CSV file
-    * @return a Map where the key is employee number and value is list of records
+    * @return a Map where the key is employee number and the value is a list of records
     */
     public static Map<String, List<String[]>> loadAttendanceRecords(String attendanceRecords) {
         Map<String, List<String[]>> attendanceMap = new HashMap<>();
@@ -119,7 +121,7 @@ public class FinalCodeOutput {
             if (!attendanceMap.containsKey(employeeNumber)) {
                 attendanceMap.put(employeeNumber, new ArrayList<>());
             }
-            // Add the attendance record to the corresponding employee
+            // Adds the attendance record to the corresponding employee
             attendanceMap.get(employeeNumber).add(data);
             }
 
@@ -128,38 +130,38 @@ public class FinalCodeOutput {
         }
         return attendanceMap;
     }
+ 
     /**
-    * Computes the total number of hours worked by an employee based on login
-    * and logout times from the attendance record.
+    * Calculates the total hours worked by an employee based on their
+    * login and logout times from the attendance record.
     *
-    * The method applies MotorPH attendance policies:
+    * The calculation follows MotorPH attendance policies:
     * - Official start time: 8:00 AM
     * - Grace period: until 8:10 AM
     * - Official end time: 5:00 PM
     * - Maximum working hours per day: 8 hours
     *
-    * If an employee logs in before the official start time,
-    * the login time is adjusted to 8:00 AM.
+    * Adjustments:
+    * - Login times before 8:00 AM are treated as 8:00 AM.
+    * - Logout times after 5:00 PM are treated as 5:00 PM.
     *
-    * If the employee logs out after the official end time,
-    * the logout time is adjusted to 5:00 PM.
-    *
-    * @param login  the recorded login time of the employee
-    * @param logout the recorded logout time of the employee
-    * @return the total number of hours worked for the day
+    * @param login  the employee's recorded login time
+    * @param logout the employee's recorded logout time
+    * @return the total hours worked by the employee for the day
     */
+
     public static double computeTotalHoursWorked(LocalTime login, LocalTime logout) {
 
         LocalTime officialStart = LocalTime.of(8, 0); // Official work start time (8:00 AM)
         LocalTime graceTime = LocalTime.of(8, 10);    // Grace period limit (8:10 AM)
         LocalTime officialEnd = LocalTime.of(17, 0);  // Official end time (5:00 PM)
 
-        // Adjust logout if it exceeds official working hours
+        // Adjusts the logout time if it exceeds the official end of working hours.
         if (logout.isAfter(officialEnd)) {
             logout = officialEnd;
         }
 
-        // Adjust login if earlier than allowed working time
+        // Adjusts the login time if it is earlier than the official start time.
         if (login.isBefore(officialStart)) {
             login = officialStart;
         }
@@ -169,7 +171,7 @@ public class FinalCodeOutput {
             login = officialStart;
         }
 
-        // Prevent negative working hours scenario
+        // Ensures total hours worked cannot be negative.
         if (login.isAfter(logout)) {
             return 0;
         }
@@ -183,15 +185,14 @@ public class FinalCodeOutput {
             hoursWorked -= 1;
         }
 
-        // Cap working hours to maximum of 8 hours per day
+        // Cap working hours to a maximum of 8 hours per day
         return Math.min(hoursWorked, 8.0);
     } 
     /**
     * Computes the Social Security System (SSS) deduction for an employee
     * based on the official SSS salary contribution table.
     *
-    * The deduction is determined by the employee's total gross salary
-    * for the payroll period.
+    * Deduction is calculated based on the employee’s total gross salary for the payroll period.
     *
     * @param grossSalary the employee's total gross salary
     * @return the SSS deduction amount
@@ -247,7 +248,7 @@ public class FinalCodeOutput {
     * Computes the PhilHealth contribution deduction for an employee.
     *
     * PhilHealth contribution is calculated as 3% of the employee's salary,
-    * shared equally between employer and employee. Only the employee share
+    * shared equally between the employer and employee. Only the employee share
     * is deducted in this program.
     *
     * Salary limits are applied based on PhilHealth contribution rules.
@@ -309,11 +310,11 @@ public class FinalCodeOutput {
     *
     * The method computes total hours worked per month (June to December),
     * separates them into first (1-15) and second (16-end) cutoffs,
-    * calculates gross salary, applies deductions (SSS, PhilHealth, Pag-IBIG, Income Tax),
+    * calculates gross salary, applies deductions on the second cut-off (SSS, PhilHealth, Pag-IBIG, Income Tax),
     * and prints net salary for each cutoff.
     *
     * @param employeeNumber employee's unique ID
-    * @param employeeFirstName employee's first name
+    * @param employeeFirstName the employee's first name
     * @param employeeLastName employee's last name
     * @param employeeBirthday employee's birthday
     * @param employeeHourlyRate hourly rate of the employee
@@ -335,7 +336,7 @@ public class FinalCodeOutput {
         if (records != null) {
             for (String[] data : records) {
             if (data.length < 6) continue;
-                // Parsing the date of attendance record
+                // Parsing the date of the attendance record
                 String[] dateParts = data[3].split("/");
                 int recordMonth = Integer.parseInt(dateParts[0]);
                 int day = Integer.parseInt(dateParts[1]);
@@ -388,16 +389,19 @@ public class FinalCodeOutput {
             System.out.println("Net Salary: " + secondNetSalary);     
         }
     }
-    /**
+   
+    public static void main(String[] args) 
+     /**
      * Entry point of the MotorPH Payroll System.
-    *
-    * Handles user login, loads employee and attendance data,
-    * displays main menu options based on user type (employee or payroll staff),
-    * and calls appropriate methods to view or process payroll.
-    *
-    * @param args command-line arguments (not used)
-    */
-    public static void main(String[] args) {
+     * Purpose of the program: 
+     * 
+     * The MotorPH Payroll System manages employee attendance and payroll.
+     * It handles user authentication, loads employee and attendance data,
+     * calculates total hours worked based on company attendance policies,
+     * applies payroll deductions such as PhilHealth contributions,
+     * and provides menu options for employees and payroll staff to view or process payroll.
+      */
+         {
         // File paths for employee details and attendance CSV files
         String employeeDatabase = "src/MotorPH_Employee Data - Employee Details.csv";
         String attendanceRecords = "src/MotorPH_Employee Data - Attendance Record.csv";
@@ -407,12 +411,12 @@ public class FinalCodeOutput {
         Scanner input = new Scanner(System.in);
         // Call loginPage method to authenticate user
         String selectedUsername = loginPage(input, validUsername1, validUsername2);
-        // This block of code check if the login failed (null is returned if max attempts exceeded)
+        // This block of code checks if the login failed (null is returned if max attempts exceeded)
         if (selectedUsername == null) {
         input.close();
         return;
         } 
-        // Load all attendance records into a Map for quick access by employee number
+        // Load all attendance records into a Map for quick access with employee number as the key.
         Map<String, List<String[]>> attendanceMap = loadAttendanceRecords(attendanceRecords);
         boolean running = true;
         // Main menu loop, continues until the user chooses to exit
@@ -500,8 +504,8 @@ public class FinalCodeOutput {
             } 
             } 
             }
-        case "2" -> running = false; // If the user chose to exit the program (2)
-        //If the user selected an option that is not 1 or 2
+        case "2" -> running = false; // If the user chooses to exit the program (2)
+        //If the user selects an option that is not 1 or 2
         default -> System.out.println("Invalid option selected. Please restart the program and choose either 1 or 2.");
         }
         }
